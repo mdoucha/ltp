@@ -63,13 +63,11 @@ static void run(void)
 
 	for (i = 0; i < 1000; i++) {
 		sock = SAFE_SOCKET(AF_INET6, SOCK_RAW, IPPROTO_UDP);
-		SAFE_SETSOCKOPT_INT(sock, IPPROTO_IP, IP_HDRINCL, 0);
-		ifr.ifr_mtu = BUFSIZE;
-		SAFE_IOCTL(sock, SIOCSIFMTU, &ifr);
+		SAFE_SETSOCKOPT_INT(sock, SOL_IPV6, IPV6_HDRINCL, 0);
+		SAFE_SETSOCKOPT_INT(sock, SOL_IPV6, IPV6_MTU, BUFSIZE);
 		SAFE_CONNECT(sock, (struct sockaddr *)&addr, sizeof(addr));
 		SAFE_SEND(1, sock, buf, BUFSIZE, MSG_MORE);
-		ifr.ifr_mtu = 2000;
-		SAFE_IOCTL(sock, SIOCSIFMTU, &ifr);
+		SAFE_SETSOCKOPT_INT(sock, SOL_IPV6, IPV6_MTU, 2000);
 		SAFE_SEND(1, sock, buf, BUFSIZE, MSG_MORE);
 		SAFE_SEND(1, sock, buf, BUFSIZE, 0);
 		SAFE_CLOSE(sock);
