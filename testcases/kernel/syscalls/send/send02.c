@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/udp.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <sched.h>
@@ -66,11 +67,13 @@ static void run(void)
 		ifr.ifr_mtu = BUFSIZE;
 		SAFE_IOCTL(sock, SIOCSIFMTU, &ifr);
 		SAFE_CONNECT(sock, (struct sockaddr *)&addr, sizeof(addr));
+		SAFE_SETSOCKOPT_INT(sock, IPPROTO_UDP, UDP_CORK, 1);
 		SAFE_SEND(1, sock, buf, BUFSIZE, MSG_MORE);
 		ifr.ifr_mtu = 2000;
 		SAFE_IOCTL(sock, SIOCSIFMTU, &ifr);
 		SAFE_SEND(1, sock, buf, BUFSIZE, MSG_MORE);
 		SAFE_SEND(1, sock, buf, BUFSIZE, 0);
+		SAFE_SETSOCKOPT_INT(sock, IPPROTO_UDP, UDP_CORK, 0);
 		SAFE_CLOSE(sock);
 
 		if (tst_taint_check()) {
