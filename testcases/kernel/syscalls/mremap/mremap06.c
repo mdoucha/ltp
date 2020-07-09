@@ -31,21 +31,31 @@ static void *baseaddr, *mem_ptr;
 static struct tst_fzsync_pair fzsync_pair;
 static char buf[BUF_SIZE];
 
+static void sigproc(int sig)
+{
+
+}
+
 static void setup(void)
 {
 	fd = SAFE_OPEN("/dev/shm/ltp_mremap06", O_RDWR|O_CREAT|O_TRUNC, 0600);
 	ctl_fd = SAFE_OPEN("/proc/sys/vm/compact_memory", O_WRONLY);
 	memset(buf, 0x42, BUF_SIZE);
 	SAFE_WRITE(1, fd, buf, BUF_SIZE);
-	baseaddr = SAFE_MMAP(NULL, BUF_SIZE, PROT_READ, MAP_SHARED, fd, 0);
-	mem_ptr = baseaddr;
 
 	fzsync_pair.exec_loops = 100000;
 	tst_fzsync_pair_init(&fzsync_pair);
 
+	/* Reserve address range for both mappings */
+	baseaddr = SAFE_MMAP(NULL, 4 * BUF_SIZE, PROT_READ,
+		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	SAFE_MUNMAP(baseaddr, 4 * BUF_SIZE);
+	mem_ptr = SAFE_MMAP(baseaddr, BUF_SIZE, PROT_READ,
+		MAP_SHARED | MAP_FIXED, fd, 0);
+
 	/* The read thread will segfault. A lot. */
-	signal(SIGSEGV, SIG_IGN);
-	signal(SIGBUS, SIG_IGN);
+	signal(SIGSEGV, sigproc);
+	signal(SIGBUS, sigproc);
 }
 
 static void *read_task(void *arg)
