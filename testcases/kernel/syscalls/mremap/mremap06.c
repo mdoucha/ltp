@@ -26,7 +26,8 @@
 
 #define BUF_SIZE 4096
 
-static int quit, fd = -1, ctl_fd = -1;
+static volatile int quit;
+static int fd = -1, ctl_fd = -1;
 static void *baseaddr, *mem_ptr;
 static struct tst_fzsync_pair fzsync_pair;
 static char buf[BUF_SIZE];
@@ -91,6 +92,7 @@ static void run(void)
 	void *ret;
 	pthread_t read_thread;
 
+	quit = 0;
 	SAFE_PTHREAD_CREATE(&read_thread, NULL, read_task, NULL);
 	tst_fzsync_pair_reset(&fzsync_pair, ftruncate_task);
 
