@@ -65,7 +65,9 @@ static void *read_task(void *arg)
 	volatile unsigned long *readptr = baseaddr;
 
 	memset(&expval, 0x42, sizeof(expval));
-	for (curval = expval; !quit && curval == expval; curval = *readptr);
+	for (curval = expval; !quit && curval == expval; curval = *readptr)
+		;
+
 	quit = 1;
 
 	if (curval == expval)
@@ -136,9 +138,8 @@ static void cleanup(void)
 	if (mem_ptr != MAP_FAILED)
 		SAFE_MUNMAP(mem_ptr, BUF_SIZE);
 
-	if (fd >= 0) {
+	if (fd >= 0)
 		SAFE_CLOSE(fd);
-	}
 }
 
 static struct tst_test test = {
