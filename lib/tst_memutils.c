@@ -20,8 +20,11 @@ void tst_pollute_memory(size_t maxsize, int fillchar)
 	struct sysinfo info;
 
 	SAFE_SYSINFO(&info);
-	safety = MAX(4096 * SAFE_SYSCONF(_SC_PAGESIZE), 128 * 1024 * 1024);
+	SAFE_FILE_SCANF("/proc/sys/vm/min_free_kbytes", "%zd", &safety);
+	safety = MAX(2048 * safety, 128 * 1024 * 1024);
+	safety = MAX(safety, 4096 * SAFE_SYSCONF(_SC_PAGESIZE));
 	safety /= info.mem_unit;
+	safety = MAX(safety, info.freeram / 128);
 
 	if (info.freeswap > safety)
 		safety = 0;
