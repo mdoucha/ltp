@@ -147,7 +147,7 @@ static void drain_fallback(void)
 			tst_res(TFAIL | TTERRNO,
 				"Write outside chroot failed unexpectedly");
 		} else {
-			tst_res(TPASS,
+			tst_res(TPASS | TTERRNO,
 				"Write outside chroot failed as expected");
 		}
 	}
@@ -164,7 +164,7 @@ static void drain_fallback(void)
 	SAFE_CLOSE(sockpair[1]);
 }
 
-static void check_async(void)
+static void check_result(void)
 {
 	const struct io_uring_cqe *cqe_ptr;
 
@@ -196,7 +196,7 @@ static void check_async(void)
 		return;
 	}
 
-	tst_res(TPASS, "Write outside chroot failed as expected");
+	tst_res(TPASS | TTERRNO, "Write outside chroot failed as expected");
 }
 
 static void run(void)
@@ -218,24 +218,8 @@ static void run(void)
 	tail++;
 
 	__atomic_store(uring.sqr_tail, &tail, __ATOMIC_RELEASE);
-	TEST(io_uring_enter(uring.fd, 1, 1, IORING_ENTER_GETEVENTS, NULL));
-
-	if (TST_RET == -1 && TST_ERR != EINVAL)
-		tst_brk(TBROK | TTERRNO, "io_uring_enter() failed");
-
-	if (TST_RET == -1) {
-		tst_res(TINFO, "IOSQE_ASYNC is not supported, using fallback");
-		tail--;
-		__atomic_store(uring.sqr_tail, &tail, __ATOMIC_RELEASE);
-		drain_fallback();
-	} else if (TST_RET != 1) {
-		tst_brk(TBROK | TTERRNO,
-			"Unexpected io_uring_enter() return value %ld",
-			TST_RET);
-	} else {
-		check_async();
-	}
-
+	SAFE_IO_URING_ENTER(1, uring.fd, 1, 1, IORING_ENTER_GETEVENTS, NULL);
+	check_result();
 	SAFE_IO_URING_CLOSE(&uring);
 }
 
