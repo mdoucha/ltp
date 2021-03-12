@@ -44,6 +44,9 @@ enum {
 #define OVL_WORK	OVL_BASE_MNTPOINT"/work"
 #define OVL_MNT		OVL_BASE_MNTPOINT"/ovl"
 
+#define TST_FS_NATIVE 1
+#define TST_FS_FUSE   2
+
 /*
  * @path: path is the pathname of any file within the mounted file system
  * @mult: mult should be TST_KB, TST_MB or TST_GB
@@ -167,18 +170,29 @@ int tst_fill_file(const char *path, char pattern, size_t bs, size_t bcount);
  */
 int tst_prealloc_file(const char *path, size_t bs, size_t bcount);
 
-#define TST_FS_SKIP_FUSE 0x01
-
 /*
- * Return 1 if a specified fiilsystem is supported
- * Return 0 if a specified fiilsystem isn't supported
+ * Return TST_FS_NATIVE if a specified filesystem is supported by kernel
+ * Return TST_FS_FUSE if a specified filesystem is supported through FUSE
+ * Return 0 if a specified filesystem isn't supported
+ *
+ * @fs_type A filesystem type to check the support for.
  */
-int tst_fs_is_supported(const char *fs_type, int flags);
+int tst_fs_is_supported(const char *fs_type);
 
 /*
  * Returns NULL-terminated array of kernel-supported filesystems.
+ *
+ * @skiplist A NULL terminated array of filesystems to skip.
  */
-const char **tst_get_supported_fs_types(int flags);
+const char **tst_get_supported_fs_types(const char *const *skiplist);
+
+/*
+ * Returns 1 if filesystem is in skiplist 0 otherwise.
+ *
+ * @fs_type A filesystem type to lookup.
+ * @skiplist A NULL terminated array of fileystemsytems to skip.
+ */
+int tst_fs_in_skiplist(const char *fs_type, const char *const *skiplist);
 
 /*
  * Creates and writes to files on given path until write fails with ENOSPC

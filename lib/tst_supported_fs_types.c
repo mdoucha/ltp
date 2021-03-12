@@ -45,7 +45,22 @@ static int has_mkfs(const char *fs_type)
 	return 1;
 }
 
-static int has_kernel_support(const char *fs_type, int flags)
+int tst_fs_in_skiplist(const char *fs_type, const char *const *skiplist)
+{
+	unsigned int i;
+
+	if (!skiplist)
+		return 0;
+
+	for (i = 0; skiplist[i]; i++) {
+		if (!strcmp(fs_type, skiplist[i]))
+			return 1;
+	}
+
+	return 0;
+}
+
+static int has_kernel_support(const char *fs_type)
 {
 	static int fuse_supported = -1;
 	const char *tmpdir = getenv("TMPDIR");
@@ -58,7 +73,7 @@ static int has_kernel_support(const char *fs_type, int flags)
 	mount("/dev/zero", tmpdir, fs_type, 0, NULL);
 	if (errno != ENODEV) {
 		tst_res(TINFO, "Kernel supports %s", fs_type);
-		return 1;
+		return TST_FS_NATIVE;
 	}
 
 	/* Is FUSE supported by kernel? */
@@ -84,26 +99,36 @@ static int has_kernel_support(const char *fs_type, int flags)
 		return 0;
 	}
 
-	if (flags & TST_FS_SKIP_FUSE) {
-		tst_res(TINFO, "Skipping FUSE as requested by the test");
-		return 0;
-	}
-
 	tst_res(TINFO, "FUSE does support %s", fs_type);
-	return 1;
+	return TST_FS_FUSE;
 }
 
-int tst_fs_is_supported(const char *fs_type, int flags)
+int tst_fs_is_supported(const char *fs_type)
 {
-	return has_kernel_support(fs_type, flags) && has_mkfs(fs_type);
+	if (has_mkfs(fs_type))
+		return has_kernel_support(fs_type);
+
+	return 0;
 }
 
-const char **tst_get_supported_fs_types(int flags)
+const char **tst_get_supported_fs_types(const char *const *skiplist)
 {
-	unsigned int i, j = 0;
+	unsigned int ret, skip_fuse, i, j = 0;
+
+	skip_fuse = tst_fs_in_skiplist("fuse", skiplist);
 
 	for (i = 0; fs_type_whitelist[i]; i++) {
-		if (tst_fs_is_supported(fs_type_whitelist[i], flags))
+		if (tst_fs_in_skiplist(fs_type_whitelist[i], skiplist))
+			continue;
+
+		ret = tst_fs_is_supported(fs_type_whitelist[i]);
+
+		if (ret == TST_FS_FUSE && skip_fuse) {
+			tst_res(TINFO, "Skipping FUSE as requested by test");
+			continue;
+		}
+
+		if (ret)
 			fs_types[j++] = fs_type_whitelist[i];
 	}
 
