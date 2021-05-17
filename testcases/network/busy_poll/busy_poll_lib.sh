@@ -27,6 +27,8 @@ busy_poll_check_config()
 			tst_brk TCONF "busy poll not supported by driver"
 	else
 		drvs="bnx2x|bnxt|cxgb4|enic|benet|ixgbe|ixgbevf|mlx4|mlx5|myri10ge|sfc|virtio"
+		tst_res TINFO $(tst_iface)
+		ethtool -i $(tst_iface)
 		ethtool -i $(tst_iface) | grep -qE "driver: ($drvs)" || \
 			tst_brk TCONF "busy poll not supported"
 	fi
