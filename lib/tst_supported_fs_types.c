@@ -11,6 +11,7 @@
 #include <sys/quota.h>
 
 #define TST_NO_DEFAULT_MAIN
+#include "tst_safe_stdio.h"
 #include "tst_test.h"
 #include "tst_fs.h"
 
@@ -52,6 +53,51 @@ static int has_mkfs(const char *fs_type)
 	return 1;
 }
 
+static int is_sle_11(void)
+{
+	FILE *f;
+	char buf[1024];
+	int is_sle = 0;
+	int is_ver_11 = 0;
+
+	if (access("/etc/os-release", F_OK))
+		return 0;
+
+	f = SAFE_FOPEN("/etc/os-release", "r");
+
+	for (;;) {
+		char *str;
+
+		if (fscanf(f, "%1024s", buf) < 1)
+			break;
+
+		str = strtok(buf, "=");
+
+		if (!strcmp(str, "NAME")) {
+			str = strtok(NULL, "=");
+			if (str && !strncmp(str, "\"SLE", 4)) {
+				is_sle = 1;
+				tst_res(TINFO, "SLE* distribution detected");
+			}
+		}
+
+		if (!strcmp(str, "VERSION")) {
+			str = strtok(NULL, "=");
+			if (str && !strncmp(str, "\"11", 3)) {
+				is_ver_11 = 1;
+				tst_res(TINFO, "Version 11* detected");
+			}
+		}
+
+		if (is_ver_11 && is_sle)
+			break;
+	}
+
+	SAFE_FCLOSE(f);
+
+	return is_sle && is_ver_11;
+}
+
 int tst_fs_in_skiplist(const char *fs_type, const char *const *skiplist)
 {
 	unsigned int i;
@@ -74,6 +120,11 @@ static enum tst_fs_impl has_kernel_support(const char *fs_type)
 	char buf[128];
 	char template[PATH_MAX];
 	int ret;
+
+	if (!strcmp(fs_type, "ext4") && is_sle_11()) {
+		tst_res(TINFO, "Disabling crippled SLE11 ext4");
+		return 0;
+	}
 
 	if (!tmpdir)
 		tmpdir = "/tmp";
