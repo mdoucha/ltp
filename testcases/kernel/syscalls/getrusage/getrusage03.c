@@ -58,6 +58,7 @@ static void fork_malloc(void);
 static void grandchild_maxrss(void);
 static void zombie(void);
 static void sig_ign(void);
+static void grandchild_exec(void);
 static void exec_without_fork(void);
 static void check_return(int status, char *pass_msg, char *fail_msg);
 static int is_in_delta(long value);
@@ -85,6 +86,7 @@ int main(int argc, char *argv[])
 		grandchild_maxrss();
 		zombie();
 		sig_ign();
+		grandchild_exec();
 		exec_without_fork();
 	}
 	cleanup();
@@ -282,6 +284,38 @@ static void sig_ign(void)
 	signal(SIGCHLD, SIG_DFL);
 }
 
+/* Testcase #07: grandchild maxrss
+ * expect: post_wait.children ~= 600MB */
+static void grandchild_exec(void)
+{
+	tst_resm(TINFO, "Testcase #07: grandchild exec");
+
+	SAFE_GETRUSAGE(cleanup, RUSAGE_CHILDREN, &ru);
+	tst_resm(TINFO, "initial.children = %ld", ru.ru_maxrss);
+
+	switch (pid = fork()) {
+	case -1:
+		tst_brkm(TBROK | TERRNO, cleanup, "fork #4");
+	case 0:
+		execlp("getrusage03_child", "getrusage03_child", "-g", "600", (char*)NULL);
+		tst_brkm(TBROK | TERRNO, cleanup, "exec");
+		exit(1);
+	default:
+		break;
+	}
+
+	SAFE_WAITPID(cleanup, pid, &status, WUNTRACED | WCONTINUED);
+	if (WEXITSTATUS(status) != 0)
+		tst_brkm(TBROK | TERRNO, cleanup, "child exit status is not 0");
+
+	SAFE_GETRUSAGE(cleanup, RUSAGE_CHILDREN, &ru);
+	tst_resm(TINFO, "post_wait.children = %ld", ru.ru_maxrss);
+	if (is_in_delta(ru.ru_maxrss - 600*1024))
+		tst_resm(TPASS, "child.children ~= 600MB");
+	else
+		tst_resm(TFAIL, "child.children !~= 600MB");
+}
+
 /* Testcase #07: exec without fork
  * expect: initial ~= fork */
 static void exec_without_fork(void)
@@ -289,7 +323,7 @@ static void exec_without_fork(void)
 	char str_maxrss_self[BUFSIZ], str_maxrss_child[BUFSIZ];
 	long maxrss_self, maxrss_child;
 
-	tst_resm(TINFO, "Testcase #07: exec without fork");
+	tst_resm(TINFO, "Testcase #08: exec without fork");
 
 	SAFE_GETRUSAGE(cleanup, RUSAGE_SELF, &ru);
 	maxrss_self = ru.ru_maxrss;
