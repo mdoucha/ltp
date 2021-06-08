@@ -154,6 +154,11 @@ static void consume(int mega)
 	sz = mega * 1024 * 1024;
 	ptr = SAFE_MALLOC(cleanup, sz);
 	memset(ptr, 0, sz);
+
+	SAFE_FILE_LINES_SCANF(cleanup, "/proc/self/status", "VmSwap: %zu", &sz);
+
+	if (sz)
+		tst_brkm(TBROK, cleanup, "Swapping detected");
 }
 
 static void setup(void)
