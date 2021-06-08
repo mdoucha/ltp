@@ -189,7 +189,7 @@ static void grandchild_maxrss(void)
 	case -1:
 		tst_brkm(TBROK | TERRNO, cleanup, "fork #4");
 	case 0:
-		retval = system("getrusage03_child -g 300");
+		retval = system("getrusage03_child -v -g 300");
 		if ((WIFEXITED(retval) && WEXITSTATUS(retval) != 0))
 			tst_brkm(TBROK | TERRNO, cleanup, "system");
 		exit(0);
@@ -223,7 +223,7 @@ static void zombie(void)
 	case -1:
 		tst_brkm(TBROK, cleanup, "fork #5");
 	case 0:
-		retval = system("getrusage03_child -n 400");
+		retval = system("getrusage03_child -v -n 400");
 		if ((WIFEXITED(retval) && WEXITSTATUS(retval) != 0))
 			tst_brkm(TBROK | TERRNO, cleanup, "system");
 		exit(0);
@@ -266,7 +266,7 @@ static void sig_ign(void)
 	case -1:
 		tst_brkm(TBROK, cleanup, "fork #6");
 	case 0:
-		retval = system("getrusage03_child -n 500");
+		retval = system("getrusage03_child -v -n 500");
 		if ((WIFEXITED(retval) && WEXITSTATUS(retval) != 0))
 			tst_brkm(TBROK | TERRNO, cleanup, "system");
 		exit(0);
@@ -297,7 +297,7 @@ static void grandchild_exec(void)
 	case -1:
 		tst_brkm(TBROK | TERRNO, cleanup, "fork #4");
 	case 0:
-		execlp("getrusage03_child", "getrusage03_child", "-g", "600", (char*)NULL);
+		execlp("getrusage03_child", "getrusage03_child", "-v", "-g", "600", (char*)NULL);
 		tst_brkm(TBROK | TERRNO, cleanup, "exec");
 		exit(1);
 	default:
