@@ -312,7 +312,7 @@ static void verify(void)
 		ioctl(hwfd[i], PERF_EVENT_IOC_DISABLE);
 		ioctl(tskfd[i], PERF_EVENT_IOC_DISABLE);
 	}
-	do_work(2);
+	do_work(8);
 	all_counters_set(PR_TASK_PERF_EVENTS_DISABLE);
 
 	sparam.sched_priority = 0;
