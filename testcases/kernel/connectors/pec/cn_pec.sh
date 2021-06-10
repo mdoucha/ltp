@@ -76,7 +76,9 @@ test()
 	# wait for pec_listener to start listening
 	tst_sleep 100ms
 
+	tst_res TINFO "Running event generator..."
 	ROD event_generator -n $num_events -e $event \>gen_$event.log 2\>gen_$event.err
+	tst_res TINFO "Test complete..."
 
 	kill -s INT $pid 2> /dev/null
 	wait $pid
@@ -105,6 +107,8 @@ test()
 	fd_act=$(free_fd)
 	[ -z "$fd_act" ] && tst_brk TBROK "No free filehandle found"
 	eval "exec ${fd_act}<lis_$event.log"
+
+	tst_res TINFO "Validating results..."
 
 	failed=0
 	act_nevents=0
