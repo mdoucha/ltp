@@ -73,7 +73,9 @@ static void setup(void)
 
 	/* Switch user */
 	tst_capget(&caphdr, &capdata);
-	tst_res(TINFO, "Effective caps before: %X", capdata.effective);
+	tst_res(TINFO,
+		"Process capabilities: eff = %X, perm = %X, inherit = %X",
+		capdata.effective, capdata.permitted, capdata.inheritable);
 	SAFE_SETGID(ltpuser->pw_gid);
 	SAFE_SETREUID(-1, ltpuser->pw_uid);
 	tst_res(TINFO, "Switched to euid %d, egid %d", geteuid(), getegid());
@@ -82,7 +84,9 @@ static void setup(void)
 	errno = 0;
 	gcount = getgroups(MAX_GROUPS, supgroups);
 	tst_capget(&caphdr, &capdata);
-	tst_res(TINFO, "Effective caps after: %X", capdata.effective);
+	tst_res(TINFO,
+		"Process capabilities: eff = %X, perm = %X, inherit = %X",
+		capdata.effective, capdata.permitted, capdata.inheritable);
 
 	if (gcount < 0) {
 		tst_res(TWARN | TERRNO, "Supplemental group query failed");
