@@ -20,9 +20,11 @@
  *  Fix up non-directory creation in SGID directories
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <pwd.h>
 #include <errno.h>
 #include "tst_test.h"
@@ -68,6 +70,8 @@ static void setup(void)
 	SAFE_SETGID(ltpuser->pw_gid);
 	SAFE_SETREUID(-1, ltpuser->pw_uid);
 	tst_res(TINFO, "Switched to euid %d, egid %d", geteuid(), getegid());
+	tst_res(TINFO, "Process belongs to group %d: %d", (int)free_gid,
+		group_member(free_gid));
 	errno = 0;
 	gcount = getgroups(MAX_GROUPS, supgroups);
 
