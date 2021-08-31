@@ -20,9 +20,11 @@
  *  Fix up non-directory creation in SGID directories
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <errno.h>
 #include "tst_test.h"
 #include "tst_uid.h"
 
@@ -33,13 +35,16 @@
 #define CREAT_FILE	WORKDIR "/creat.tmp"
 #define OPEN_FILE	WORKDIR "/open.tmp"
 
-static gid_t free_gid;
+#define MAX_GROUPS 32768
+
+static gid_t free_gid, supgroups[MAX_GROUPS];
 static int fd = -1;
 
 static void setup(void)
 {
 	struct stat buf;
 	struct passwd *ltpuser = SAFE_GETPWNAM("nobody");
+	int i, gcount;
 
 	tst_res(TINFO, "User nobody: uid = %d, gid = %d", (int)ltpuser->pw_uid,
 		(int)ltpuser->pw_gid);
@@ -62,6 +67,23 @@ static void setup(void)
 	/* Switch user */
 	SAFE_SETGID(ltpuser->pw_gid);
 	SAFE_SETREUID(-1, ltpuser->pw_uid);
+	errno = 0;
+	gcount = getgroups(MAX_GROUPS, supgroups);
+
+	if (gcount < 0) {
+		tst_res(TWARN | TERRNO, "Supplemental group query failed");
+		return;
+	} else if (!gcount) {
+		tst_res(TINFO, "Test process has no supplemental groups");
+		return;
+	}
+
+	tst_res(TINFO, "Test process supplemental groups:");
+
+	for (i = 0; i < gcount; i++)
+		printf("%d ", (int)supgroups[i]);
+
+	printf("\n");
 }
 
 static void file_test(const char *name)
