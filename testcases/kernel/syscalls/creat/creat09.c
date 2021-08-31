@@ -46,6 +46,11 @@ static void setup(void)
 {
 	struct stat buf;
 	struct passwd *ltpuser = SAFE_GETPWNAM("nobody");
+	struct tst_cap_user_header caphdr = {
+		.version = 0x20080522,
+		.pid = 0
+	};
+	struct tst_cap_user_data capdata = {0};
 	int i, gcount;
 
 	tst_res(TINFO, "User nobody: uid = %d, gid = %d", (int)ltpuser->pw_uid,
@@ -67,6 +72,8 @@ static void setup(void)
 	}
 
 	/* Switch user */
+	tst_capget(&caphdr, &capdata);
+	tst_res(TINFO, "Effective caps before: %X", capdata.effective);
 	SAFE_SETGID(ltpuser->pw_gid);
 	SAFE_SETREUID(-1, ltpuser->pw_uid);
 	tst_res(TINFO, "Switched to euid %d, egid %d", geteuid(), getegid());
@@ -74,6 +81,8 @@ static void setup(void)
 		group_member(free_gid));
 	errno = 0;
 	gcount = getgroups(MAX_GROUPS, supgroups);
+	tst_capget(&caphdr, &capdata);
+	tst_res(TINFO, "Effective caps after: %X", capdata.effective);
 
 	if (gcount < 0) {
 		tst_res(TWARN | TERRNO, "Supplemental group query failed");
