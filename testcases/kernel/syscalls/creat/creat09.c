@@ -51,7 +51,6 @@ static void setup(void)
 		.pid = 0
 	};
 	struct tst_cap_user_data capdata = {0};
-	int i, gcount;
 
 	tst_res(TINFO, "User nobody: uid = %d, gid = %d", (int)ltpuser->pw_uid,
 		(int)ltpuser->pw_gid);
@@ -78,6 +77,36 @@ static void setup(void)
 		capdata.effective, capdata.permitted, capdata.inheritable);
 	SAFE_SETGID(ltpuser->pw_gid);
 	SAFE_SETREUID(-1, ltpuser->pw_uid);
+}
+
+static void file_test(const char *name)
+{
+	struct stat buf;
+
+	SAFE_STAT(name, &buf);
+
+	if (buf.st_gid != free_gid) {
+		tst_res(TFAIL, "%s: Incorrect group, %u != %u", name,
+			buf.st_gid, free_gid);
+	} else {
+		tst_res(TPASS, "%s: Owned by correct group", name);
+	}
+
+	if (buf.st_mode & S_ISGID)
+		tst_res(TFAIL, "%s: Setgid bit is set", name);
+	else
+		tst_res(TPASS, "%s: Setgid bit not set", name);
+}
+
+static void run(void)
+{
+	struct tst_cap_user_header caphdr = {
+		.version = 0x20080522,
+		.pid = 0
+	};
+	struct tst_cap_user_data capdata = {0};
+	int i, gcount;
+
 	tst_res(TINFO, "Switched to euid %d, egid %d", geteuid(), getegid());
 	tst_res(TINFO, "Process belongs to group %d: %d", (int)free_gid,
 		group_member(free_gid));
@@ -102,29 +131,7 @@ static void setup(void)
 		printf("%d ", (int)supgroups[i]);
 
 	printf("\n");
-}
 
-static void file_test(const char *name)
-{
-	struct stat buf;
-
-	SAFE_STAT(name, &buf);
-
-	if (buf.st_gid != free_gid) {
-		tst_res(TFAIL, "%s: Incorrect group, %u != %u", name,
-			buf.st_gid, free_gid);
-	} else {
-		tst_res(TPASS, "%s: Owned by correct group", name);
-	}
-
-	if (buf.st_mode & S_ISGID)
-		tst_res(TFAIL, "%s: Setgid bit is set", name);
-	else
-		tst_res(TPASS, "%s: Setgid bit not set", name);
-}
-
-static void run(void)
-{
 	fd = SAFE_CREAT(CREAT_FILE, MODE_SGID);
 	SAFE_CLOSE(fd);
 	file_test(CREAT_FILE);
