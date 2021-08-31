@@ -67,6 +67,7 @@ static void setup(void)
 	/* Switch user */
 	SAFE_SETGID(ltpuser->pw_gid);
 	SAFE_SETREUID(-1, ltpuser->pw_uid);
+	tst_res(TINFO, "Switched to euid %d, egid %d", geteuid(), getegid());
 	errno = 0;
 	gcount = getgroups(MAX_GROUPS, supgroups);
 
