@@ -92,6 +92,8 @@ static void file_test(const char *name)
 		tst_res(TPASS, "%s: Owned by correct group", name);
 	}
 
+	tst_res(TINFO, "%s: File mode = %03o", name, buf.st_mode);
+
 	if (buf.st_mode & S_ISGID)
 		tst_res(TFAIL, "%s: Setgid bit is set", name);
 	else
@@ -106,6 +108,7 @@ static void run(void)
 	};
 	struct tst_cap_user_data capdata = {0};
 	int i, gcount;
+	mode_t mask;
 
 	tst_res(TINFO, "Switched to euid %d, egid %d", geteuid(), getegid());
 	tst_res(TINFO, "Process belongs to group %d: %d", (int)free_gid,
@@ -131,6 +134,10 @@ static void run(void)
 		printf("%d ", (int)supgroups[i]);
 
 	printf("\n");
+
+	mask = umask(0);
+	umask(mask);
+	tst_res(TINFO, "umask: %03o", mask);
 
 	fd = SAFE_CREAT(CREAT_FILE, MODE_SGID);
 	SAFE_CLOSE(fd);
