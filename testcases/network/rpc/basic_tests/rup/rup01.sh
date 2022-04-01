@@ -19,7 +19,6 @@ TCID="rup01"
 TST_TOTAL=7
 
 TST_USE_LEGACY_API=1
-. tst_net.sh
 
 do_setup()
 {

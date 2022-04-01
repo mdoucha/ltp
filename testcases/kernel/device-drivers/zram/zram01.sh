@@ -9,7 +9,6 @@
 TST_CNT=7
 TST_TESTFUNC="do_test"
 TST_NEEDS_CMDS="awk bc dd"
-. zram_lib.sh
 TST_SETUP="setup"
 
 check_space_for_btrfs()
@@ -151,4 +150,5 @@ do_test()
 	esac
 }
 
+. zram_lib.sh
 tst_run

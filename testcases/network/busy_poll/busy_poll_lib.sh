@@ -1,5 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (c) Linux Test Project, 2016-2022
 # Copyright (c) 2016-2018 Oracle and/or its affiliates. All Rights Reserved.
 
 TST_SETUP="setup"
@@ -11,8 +12,6 @@ TST_NEEDS_ROOT=1
 TST_NEEDS_CMDS="pkill sysctl ethtool"
 # for more stable results set to a single thread
 TST_NETLOAD_CLN_NUMBER=1
-
-. tst_net.sh
 
 busy_poll_check_config()
 {
@@ -27,3 +26,5 @@ busy_poll_check_config()
 			tst_brk TCONF "busy poll not supported by driver"
 	fi
 }
+
+. tst_net.sh

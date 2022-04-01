@@ -19,7 +19,6 @@ TCID="rusers01"
 TST_TOTAL=5
 
 TST_USE_LEGACY_API=1
-. tst_net.sh
 
 do_setup()
 {

@@ -6,13 +6,11 @@
 # Author: Alexey Kodanev alexey.kodanev@oracle.com
 
 dhcp_name="dnsmasq"
-
-. dhcp_lib.sh
-
 log="/var/log/dnsmasq.tst.log"
 
 lease_dir="/var/lib/misc"
 tst_selinux_enforced && lease_dir="/var/lib/dnsmasq"
+
 lease_file="$lease_dir/dnsmasq.tst.leases"
 
 common_opt="--no-hosts --no-resolv --dhcp-authoritative \
@@ -47,4 +45,5 @@ print_dhcp_version()
 	dnsmasq --version | head -2
 }
 
+. dhcp_lib.sh
 tst_run

@@ -11,7 +11,6 @@ TST_TESTFUNC=do_test
 TST_NEEDS_ROOT=1
 TST_NEEDS_DEVICE=1
 TST_NEEDS_CMDS="uuidgen blkid blockdev mkswap"
-. tst_test.sh
 
 setup()
 {
@@ -157,4 +156,5 @@ do_test()
 	esac
 }
 
+. tst_test.sh
 tst_run

@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (c) 2014-2018 Oracle and/or its affiliates. All Rights Reserved.
-# Copyright (c) 2018 Petr Vorel <pvorel@suse.cz>
+# Copyright (c) 2018-2022 Petr Vorel <pvorel@suse.cz>
 # Author:       Alexey Kodanev alexey.kodanev@oracle.com
 
 TST_SETUP="dhcp_lib_setup"
@@ -10,9 +10,6 @@ TST_TESTFUNC="test01"
 TST_NEEDS_TMPDIR=1
 TST_NEEDS_ROOT=1
 TST_NEEDS_CMDS="cat $dhcp_name awk ip pgrep pkill dhclient"
-
-. tst_net.sh
-. daemonlib.sh
 
 iface0="ltp_veth0"
 iface1="ltp_veth1"
@@ -174,3 +171,6 @@ EOF
 
 	stop_dhcp
 }
+
+. tst_net.sh
+. daemonlib.sh
