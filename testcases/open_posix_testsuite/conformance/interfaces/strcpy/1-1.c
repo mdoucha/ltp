@@ -44,7 +44,7 @@ static char *random_string(int len)
     return output_string;
 }
 
-int main(void)
+int test_main(int argc, char** argv)
 {
     char *ret_str;
     int i;

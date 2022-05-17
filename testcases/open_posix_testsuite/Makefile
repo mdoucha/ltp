@@ -36,7 +36,7 @@ ac-clean: clean
 clean:
 	$(RM) -f $(LOGFILE)*
 	$(RM) -f config.log config.status
-	@for dir in $(SUBDIRS) tools; do \
+	@for dir in $(SUBDIRS) lib tools; do \
 		$(MAKE) -C $$dir clean >/dev/null; \
 	done
 
@@ -72,8 +72,11 @@ install: bin-install conformance-install functional-install stress-install
 test: conformance-test functional-test stress-test
 
 # Test build and execution targets.
-.PHONY: conformance-all conformance-install conformance-test
-conformance-all: $(CRITICAL_MAKEFILE)
+.PHONY: conformance-all conformance-install conformance-test lib-all
+lib-all:
+	@$(BUILD_MAKE) -C lib all
+
+conformance-all: $(CRITICAL_MAKEFILE) lib-all
 	@rm -f `if echo "$(LOGFILE)" | grep -q '^/'; then echo "$(LOGFILE)"; else echo "\`pwd\`/$(LOGFILE)"; fi`.$@
 	@$(BUILD_MAKE) -C conformance -j1 all
 
@@ -85,7 +88,7 @@ conformance-test:
 	@$(TEST_MAKE) -C conformance test
 
 .PHONY: functional-all functional-install functional-test
-functional-all: $(CRITICAL_MAKEFILE)
+functional-all: $(CRITICAL_MAKEFILE) lib-all
 	@rm -f `if echo "$(LOGFILE)" | grep -q '^/'; then echo "$(LOGFILE)"; else echo "\`pwd\`/$(LOGFILE)"; fi`.$@
 	@$(BUILD_MAKE) -C functional -j1 all
 
@@ -97,7 +100,7 @@ functional-test:
 	@$(TEST_MAKE) -C functional test
 
 .PHONY: stress-all stress-install stress-test
-stress-all: $(CRITICAL_MAKEFILE)
+stress-all: $(CRITICAL_MAKEFILE) lib-all
 	@rm -f `if echo "$(LOGFILE)" | grep -q '^/'; then echo "$(LOGFILE)"; else echo "\`pwd\`/$(LOGFILE)"; fi`.$@
 	@$(BUILD_MAKE) -C stress -j1 all
 

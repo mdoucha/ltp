@@ -63,7 +63,7 @@ static void sig_handler(int signum PTS_ATTRIBUTE_UNUSED, siginfo_t *info,
 	countdown--;
 }
 
-int main(void)
+int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 {
 	char tmpfname[PATH_MAX];
 	int fd;
