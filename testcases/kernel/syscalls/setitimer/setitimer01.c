@@ -70,8 +70,12 @@ static void verify_setitimer(unsigned int i)
 		set_setitimer_value(USEC2, USEC2);
 		TST_EXP_PASS(sys_setitimer(tc->which, value, ovalue));
 
-		if (ovalue->it_value.tv_sec != 0 || ovalue->it_value.tv_usec >= USEC2)
+		if (ovalue->it_value.tv_sec != 0 || ovalue->it_value.tv_usec >= USEC2) {
+			tst_res(TFAIL, "tv_sec=%ld, tv_usec=%ld",
+				ovalue->it_value.tv_sec,
+				ovalue->it_value.tv_usec);
 			tst_brk(TFAIL, "old timer value is not within the expected range");
+		}
 
 		for (;;)
 			;
