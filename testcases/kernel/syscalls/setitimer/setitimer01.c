@@ -18,8 +18,8 @@
 #include "tst_test.h"
 #include "lapi/syscalls.h"
 
-#define USEC1	10000
-#define USEC2	20000
+#define USEC1	8000
+#define USEC2	15000
 
 static struct itimerval *value, *ovalue;
 
@@ -70,7 +70,7 @@ static void verify_setitimer(unsigned int i)
 		set_setitimer_value(USEC2 + 2345, USEC2 + 3456);
 		TST_EXP_PASS(sys_setitimer(tc->which, value, ovalue));
 
-		if (ovalue->it_value.tv_sec != 0 || ovalue->it_value.tv_usec >= USEC2) {
+		if (ovalue->it_value.tv_sec != 0 || ovalue->it_value.tv_usec > USEC2) {
 			tst_res(TFAIL, "tv_sec=%ld, tv_usec=%ld",
 				ovalue->it_value.tv_sec,
 				ovalue->it_value.tv_usec);
