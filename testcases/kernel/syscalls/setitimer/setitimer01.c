@@ -64,10 +64,10 @@ static void verify_setitimer(unsigned int i)
 
 		tst_no_corefile(0);
 
-		set_setitimer_value(USEC1, 0);
+		set_setitimer_value(USEC1 + 1234, 0);
 		TST_EXP_PASS(sys_setitimer(tc->which, value, NULL));
 
-		set_setitimer_value(USEC2, USEC2 + 123);
+		set_setitimer_value(USEC2 + 2345, USEC2 + 3456);
 		TST_EXP_PASS(sys_setitimer(tc->which, value, ovalue));
 
 		if (ovalue->it_value.tv_sec != 0 || ovalue->it_value.tv_usec >= USEC2) {
