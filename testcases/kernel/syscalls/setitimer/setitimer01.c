@@ -67,7 +67,7 @@ static void verify_setitimer(unsigned int i)
 		set_setitimer_value(USEC1, 0);
 		TST_EXP_PASS(sys_setitimer(tc->which, value, NULL));
 
-		set_setitimer_value(USEC2, USEC2);
+		set_setitimer_value(USEC2 + 123, USEC2);
 		TST_EXP_PASS(sys_setitimer(tc->which, value, ovalue));
 
 		if (ovalue->it_value.tv_sec != 0 || ovalue->it_value.tv_usec >= USEC2) {
