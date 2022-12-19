@@ -57,11 +57,13 @@ do_test()
 
 	for i in $(seq 1 $NUMLOOPS); do
 
+		tst_res TINFO ping
 		ping$TST_IPV6 -q -c1 $(tst_ipaddr rhost) -I $(tst_iface) > /dev/null || \
 			tst_brk TFAIL "cannot ping $(tst_ipaddr rhost)"
 
 		local k
 		local ret=1
+		tst_res TINFO $SHOW_CMD
 		for k in $(seq 1 30); do
 			$SHOW_CMD | grep -q $(tst_ipaddr rhost)
 			if [ $? -eq 0 ]; then
@@ -74,8 +76,10 @@ do_test()
 		[ "$ret" -ne 0 ] && \
 			tst_brk TFAIL "$entry_name entry '$(tst_ipaddr rhost)' not listed"
 
+		tst_res TINFO $DEL_CMD
 		$DEL_CMD
 
+		tst_res TINFO $SHOW_CMD
 		$SHOW_CMD | grep -q "$(tst_ipaddr rhost).*$(tst_hwaddr rhost)" && \
 			tst_brk TFAIL "'$DEL_CMD' failed, entry has " \
 				"$(tst_hwaddr rhost)' $i/$NUMLOOPS"
