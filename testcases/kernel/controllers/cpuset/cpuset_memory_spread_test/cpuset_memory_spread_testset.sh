@@ -97,6 +97,7 @@ get_meminfo()
 	local nodememinfo="$nodepath/meminfo"
 	local item="$2"
 	local info=`cat $nodememinfo | grep $item | awk '{print $4}'`
+	tst_resm TINFO "get_meminfo $nodememinfo $item: $info"
 	set_memsinfo_val $nodeid $info
 }
 
@@ -128,6 +129,8 @@ get_memsinfo()
 {
 	local i=
 
+	tst_resm TINFO "get_memsinfo()"
+
 	for i in `seq 0 $((nr_mems-1))`
 	do
 		get_meminfo $i "FilePages"
@@ -147,6 +150,8 @@ account_meminfo()
 account_memsinfo()
 {
 	local i=
+
+	tst_resm TINFO "account_memsinfo()"
 
 	for i in `seq 0 $((nr_mems-1))`
 	do
@@ -328,6 +333,7 @@ test_spread_page2()
 	fi
 }
 
+echo 3 >/proc/sys/vm/drop_caches
 init_memsinfo_array
 freemem_check
 if [ $? -ne 0 ]; then
