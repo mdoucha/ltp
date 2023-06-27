@@ -18,7 +18,6 @@
 #include <linux/btrfs.h>
 #include <linux/limits.h>
 #include "lapi/syscalls.h"
-#include "lapi/fcntl.h"
 #include "test.h"
 #include "safe_macros.h"
 #include "tst_device.h"
@@ -161,7 +160,7 @@ int tst_attach_device(const char *dev, const char *file)
 		return 1;
 	}
 
-	file_fd = open(file, O_RDWR | O_DIRECT);
+	file_fd = open(file, O_RDWR);
 	if (file_fd < 0) {
 		tst_resm(TWARN | TERRNO, "open('%s', O_RDWR) failed", file);
 		close(dev_fd);
@@ -188,6 +187,14 @@ int tst_attach_device(const char *dev, const char *file)
 		close(file_fd);
 		tst_resm(TWARN | TERRNO,
 			 "ioctl(%s, LOOP_SET_STATUS, %s) failed", dev, file);
+		return 1;
+	}
+
+	if (ioctl(dev_fd, LOOP_SET_DIRECT_IO, 1UL)) {
+		close(dev_fd);
+		close(file_fd);
+		tst_resm(TWARN | TERRNO,
+			 "ioctl(%s, LOOP_SET_DIRECT_IO, 1) failed", dev);
 		return 1;
 	}
 
