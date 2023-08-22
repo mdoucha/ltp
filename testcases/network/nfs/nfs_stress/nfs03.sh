@@ -24,22 +24,22 @@ make_subdirs()
 touch_files()
 {
 	for j in $(seq 0 $DIR_NUM); do
-		cd dir$j
+		cd dir$j || tst_brk TBROK "Cannot enter subdirectory"
 		for k in $(seq 0 $FILE_NUM); do
 			ROD touch file$j$k
 		done
-		cd ..
+		cd .. || tst_brk TBROK "NFS mount is broken"
 	done
 }
 
 rm_files()
 {
 	for j in $(seq 0 $DIR_NUM); do
-		cd dir$j
+		cd dir$j || tst_brk TBROK "Cannot enter subdirectory"
 		for k in $(seq 0 $FILE_NUM); do
 			ROD rm -f file$j$k
 		done
-		cd ..
+		cd .. || tst_brk TBROK "NFS mount is broken"
 	done
 }
 
@@ -49,26 +49,26 @@ do_test()
 
 	tst_res TINFO "creating dir1 subdirectories & files"
 	ROD mkdir -p dir1
-	cd dir1
+	cd dir1 || tst_brk TBROK "Cannot change directory"
 	make_subdirs
 	touch_files &
 	pid1=$!
-	cd ..
+	cd .. || tst_brk TBROK "NFS mount is broken"
 
 	tst_res TINFO "creating dir2 subdirectories & files"
 	ROD mkdir -p dir2
-	cd dir2
+	cd dir2 || tst_brk TBROK "Cannot change directory"
 	make_subdirs
 	touch_files &
 	pid2=$!
 
 	tst_res TINFO "cd dir1 & removing files"
-	cd ../dir1
+	cd ../dir1 || tst_brk TBROK "Cannot change directory"
 	wait $pid1
 	rm_files &
 
 	tst_res TINFO "cd dir2 & removing files"
-	cd ../dir2
+	cd ../dir2 || tst_brk TBROK "Cannot change directory"
 	wait $pid2
 	rm_files
 
