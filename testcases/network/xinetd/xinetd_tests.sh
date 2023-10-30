@@ -91,7 +91,10 @@ xinetd_test()
 
 	for a in $check_addr; do
 		p=$(echo $pattern | sed "s/ADDR/$a/")
-		echo '' | telnet $a 2>&1 | grep -qiE "$p"
+		echo '' | telnet $a &>telnet.out
+		tst_res TINFO "Telnet output:"
+		cat telnet.out
+		grep -qiE "$p" telnet.out
 		[ $? -ne 0 ] && \
 			tst_brk TFAIL "not expected output for 'telnet $a'"
 	done
