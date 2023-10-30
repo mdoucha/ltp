@@ -94,6 +94,8 @@ xinetd_test()
 		echo '' | telnet $a &>telnet.out
 		tst_res TINFO "Telnet output:"
 		cat telnet.out
+		tst_res TINFO "Service log:"
+		cat /var/log/servicelog
 		grep -qiE "$p" telnet.out
 		[ $? -ne 0 ] && \
 			tst_brk TFAIL "not expected output for 'telnet $a'"
