@@ -88,6 +88,8 @@ xinetd_test()
 	tst_res TINFO "install the new config file with telnet $desc"
 	ROD mv tst_xinetd.conf.$cnt /etc/xinetd.conf
 	restart_xinetd
+	tst_res TINFO "xinetd status:"
+	systemctl status xinetd --no-pager
 
 	for a in $check_addr; do
 		p=$(echo $pattern | sed "s/ADDR/$a/")
