@@ -90,6 +90,7 @@ xinetd_test()
 	restart_xinetd
 	tst_res TINFO "xinetd status:"
 	systemctl status xinetd --no-pager
+	sleep 1
 
 	for a in $check_addr; do
 		p=$(echo $pattern | sed "s/ADDR/$a/")
