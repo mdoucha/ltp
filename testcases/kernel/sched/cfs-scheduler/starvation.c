@@ -23,7 +23,7 @@
 #include "tst_test.h"
 
 static char *str_loop;
-static long loop = 2000000;
+static volatile long loop = 2000000;
 static char *str_timeout;
 static int timeout = 240;
 
