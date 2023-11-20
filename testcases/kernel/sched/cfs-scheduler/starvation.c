@@ -24,27 +24,9 @@
 
 static char *str_loop;
 static long loop = 2000000;
+static volatile long sigcount;
 static char *str_timeout;
 static int timeout = 240;
-
-static int wait_for_pid(pid_t pid)
-{
-	int status, ret;
-
-again:
-	ret = waitpid(pid, &status, 0);
-	if (ret == -1) {
-		if (errno == EINTR)
-			goto again;
-
-		return -1;
-	}
-
-	if (WIFSIGNALED(status))
-		return 0;
-
-	return -1;
-}
 
 static void setup(void)
 {
@@ -67,22 +49,25 @@ static void setup(void)
 
 static void handler(int sig LTP_ATTRIBUTE_UNUSED)
 {
-	if (loop > 0)
-		--loop;
+	sigcount++;
 }
 
 static void child(void)
 {
+	long i;
 	pid_t ppid = getppid();
 
 	TST_CHECKPOINT_WAIT(0);
 
-	while (1)
+	for (i = 0; i < loop; i++)
 		SAFE_KILL(ppid, SIGUSR1);
+
+	exit(0);
 }
 
 static void do_test(void)
 {
+	long intr_count = 0;
 	pid_t child_pid;
 
 	child_pid = SAFE_FORK();
@@ -93,11 +78,13 @@ static void do_test(void)
 	SAFE_SIGNAL(SIGUSR1, handler);
 	TST_CHECKPOINT_WAKE(0);
 
-	while (loop)
-		sleep(1);
+	do {
+		TEST(waitpid(child_pid, NULL, 0));
+		intr_count++;
+	} while (TST_RET < 0 && TST_ERR == EINTR);
 
-	SAFE_KILL(child_pid, SIGTERM);
-	TST_EXP_PASS(wait_for_pid(child_pid));
+	tst_res(TPASS, "waitpid() interrupted %ld times", intr_count - 1);
+	tst_res(TPASS, "Received %ld signals", sigcount);
 }
 
 static struct tst_test test = {
