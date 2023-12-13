@@ -93,6 +93,7 @@ static void run(void)
 		"tcindex", f_config);
 	NETDEV_REMOVE_TRAFFIC_FILTER(DEVNAME, qd_handle, 10, ETH_P_IP,
 		1, "tcindex");
+	usleep(100000);	// wait for delayed removal
 	ret = tst_netdev_add_traffic_filter(__FILE__, __LINE__, 0, DEVNAME,
 		qd_handle, 10, ETH_P_IP, 1, "tcindex", f_config);
 	TST_ERR = tst_netlink_errno;
