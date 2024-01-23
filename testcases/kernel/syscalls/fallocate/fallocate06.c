@@ -260,6 +260,7 @@ static struct tst_test test = {
 	.test = run,
 	.tcnt = ARRAY_SIZE(testcase_list),
 	.needs_root = 1,
+	.dev_min_size = 1024,
 	.mount_device = 1,
 	.mntpoint = MNTPOINT,
 	.all_filesystems = 1,
