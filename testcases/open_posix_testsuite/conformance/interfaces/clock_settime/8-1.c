@@ -31,6 +31,14 @@
 #define CHILDPASS 1
 #define CHILDFAIL 0
 
+static time_t mt(void)
+{
+	struct timespec ret;
+
+	clock_gettime(CLOCK_MONOTONIC, &ret);
+	return ret.tv_sec;
+}
+
 int main(void)
 {
 	struct timespec tsT0, tssleep;
@@ -46,6 +54,8 @@ int main(void)
 		perror("clock_gettime() did not return success\n");
 		return PTS_UNRESOLVED;
 	}
+
+	printf("%ld Start time: %ld.%09ld\n", mt(), tsT0.tv_sec, tsT0.tv_nsec);
 
 	if ((pid = fork()) == 0) {
 		/* child here */
@@ -64,6 +74,8 @@ int main(void)
 			perror("clock_gettime() did not return success\n");
 			return CHILDFAIL;
 		}
+
+		printf("%ld Child wakeup time: %ld.%09ld\n", mt(), tsend.tv_sec, tsend.tv_nsec);
 
 		expectedsec = tsT0.tv_sec + (SLEEPSEC - SMALLTIME);
 
@@ -89,6 +101,9 @@ int main(void)
 
 		sleep(SMALLTIME);
 
+		clock_gettime(CLOCK_REALTIME, &tsreset);
+		printf("%ld Parent wakeup time: %ld.%09ld\n", mt(), tsreset.tv_sec, tsreset.tv_nsec);
+
 		if (clock_settime(CLOCK_REALTIME, &tsT0) != 0) {
 			printf("clock_settime() did not return success\n");
 			return PTS_UNRESOLVED;
@@ -99,6 +114,7 @@ int main(void)
 			return PTS_UNRESOLVED;
 		}
 
+		printf("%ld Child reaped\n", mt());
 		getBeforeTime(&tsreset);	// get current time
 		tsreset.tv_sec += SMALLTIME;
 		setBackTime(tsreset);
