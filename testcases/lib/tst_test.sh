@@ -345,6 +345,8 @@ tst_umount()
 		tst_res TINFO "umount($mntpoint) failed, try $i ..."
 		tst_res TINFO "Likely gvfsd-trash is probing newly mounted "\
 		              "fs, kill it to speed up tests."
+		tst_res TINFO "Processes blocking umount:"
+		fuser -vm "$mntpoint"
 
 		tst_sleep 100ms
 	done
