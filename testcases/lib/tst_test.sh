@@ -347,6 +347,8 @@ tst_umount()
 		              "fs, kill it to speed up tests."
 		tst_res TINFO "Processes blocking umount:"
 		fuser -vm "$mntpoint"
+		tst_res TINFO "Active mounts:"
+		mount
 
 		tst_sleep 100ms
 	done
