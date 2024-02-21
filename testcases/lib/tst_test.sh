@@ -336,6 +336,9 @@ tst_umount()
 	fi
 
 	while [ "$i" -lt 50 ]; do
+		tst_res TINFO "Processes blocking umount of $mntpoint:"
+		fuser -vm "$mntpoint"
+
 		if umount "$mntpoint" > /dev/null; then
 			return
 		fi
@@ -345,10 +348,11 @@ tst_umount()
 		tst_res TINFO "umount($mntpoint) failed, try $i ..."
 		tst_res TINFO "Likely gvfsd-trash is probing newly mounted "\
 		              "fs, kill it to speed up tests."
-		tst_res TINFO "Processes blocking umount:"
-		fuser -vm "$mntpoint"
 		tst_res TINFO "Active mounts:"
 		mount
+
+		echo t >/proc/sysrq-trigger
+		return
 
 		tst_sleep 100ms
 	done
