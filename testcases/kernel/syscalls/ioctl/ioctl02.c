@@ -222,13 +222,17 @@ static void do_child(void)
 
 static void setup(void)
 {
+	int ldisc = -1;
+
 	if (!device)
 		tst_brk(TBROK, "You must specify a tty device with -d option");
 
 	int fd = SAFE_OPEN(device, O_RDWR, 0777);
 
 	SAFE_IOCTL(fd, TCGETS, &termios_bak);
+	SAFE_IOCTL(fd, TIOCGETD, &ldisc);
 	SAFE_CLOSE(fd);
+	tst_res(TINFO, "%s default ldisc: %d", device, ldisc);
 
 	prepare_termio();
 }
