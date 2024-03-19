@@ -117,7 +117,7 @@ tst_res()
 
 	_tst_inc_res "$res"
 
-	printf "$TST_ID $TST_COUNT " >&2
+	printf "$TST_ID $TST_COUNT %s " $(date +%s.%N) >&2
 	tst_print_colored $res "$res: " >&2
 	echo "$@" >&2
 }
