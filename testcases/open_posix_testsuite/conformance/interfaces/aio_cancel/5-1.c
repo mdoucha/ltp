@@ -52,8 +52,10 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 	int in_progress;
 	static int check_one;
 
-	if (sysconf(_SC_ASYNCHRONOUS_IO) < 200112L)
+	if (sysconf(_SC_ASYNCHRONOUS_IO) < 200112L) {
+		printf("Async IO interface is too old\n");
 		return PTS_UNSUPPORTED;
+	}
 
 	PTS_GET_TMP_FILENAME(tmpfname, "pts_aio_cancel_5_1");
 	unlink(tmpfname);
@@ -118,9 +120,10 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 				return PTS_FAIL;
 			} else if ((ret == EINPROGRESS) || (ret == 0)) {
 				if (ret == EINPROGRESS)
-					in_progress = 1;
+					in_progress++;
 
 				check_one = 1;
+				printf("Check iocb...\n");
 
 				/* check iocb is not modified */
 
@@ -135,10 +138,15 @@ int test_main(int argc PTS_ATTRIBUTE_UNUSED, char **argv PTS_ATTRIBUTE_UNUSED)
 				}
 			}
 		}
+
+		printf("IO in progress: %d\n", in_progress);
 	} while (in_progress);
 
-	if (!check_one)
+	if (!check_one) {
+		printf("Final check failed\n");
 		return PTS_UNRESOLVED;
+	}
 
+	printf("Test passed\n");
 	return PTS_PASS;
 }
