@@ -217,6 +217,7 @@ static void test_memcg_min(void)
 		     "(A/B/D memory.current=%ld) ~= %d", c[1], MB(17));
 	TST_EXP_EXPR(values_close(c[2], 0, 1),
 		     "(A/B/E memory.current=%ld) ~= 0", c[2]);
+	tst_res(TINFO, "(A/B/F memory.current=%ld) ~= 0", c[3]);
 
 	alloc_anon_in_child(trunk_cg[G], MB(170), 1);
 
