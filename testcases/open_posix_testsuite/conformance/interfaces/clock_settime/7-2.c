@@ -32,6 +32,14 @@
 #define CHILDPASS 1
 #define CHILDFAIL 0
 
+static time_t mt(void)
+{
+	struct timespec ret;
+
+	clock_gettime(CLOCK_MONOTONIC, &ret);
+	return ret.tv_sec;
+}
+
 int main(void)
 {
 	struct timespec tsT0, tsT1, tsT2;
@@ -59,11 +67,15 @@ int main(void)
 		int flags = 0;
 		struct timespec tsT3;
 
+		printf("%ld Child going to sleep\n", mt());
+
 		flags |= TIMER_ABSTIME;
 		if (clock_nanosleep(CLOCK_REALTIME, flags, &tsT1, NULL) != 0) {
 			printf("clock_nanosleep() did not return success\n");
 			return CHILDFAIL;
 		}
+
+		printf("%ld Child woke up\n", mt());
 
 		if (clock_gettime(CLOCK_REALTIME, &tsT3) != 0) {
 			perror("clock_gettime() did not return success\n");
