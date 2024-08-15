@@ -37,6 +37,15 @@ static inline void alloc_pagecache(const int fd, size_t size)
 		SAFE_WRITE(SAFE_WRITE_ALL, fd, buf, sizeof(buf));
 }
 
+static inline void alloc_readcache(const int fd, size_t size)
+{
+	char buf[BUFSIZ];
+	size_t i;
+
+	for (i = 0; i < size; i += sizeof(buf))
+		SAFE_READ(1, fd, buf, sizeof(buf));
+}
+
 static inline void alloc_anon(const size_t size)
 {
 	const size_t page_size = SAFE_SYSCONF(_SC_PAGESIZE);
