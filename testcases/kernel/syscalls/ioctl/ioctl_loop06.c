@@ -92,6 +92,8 @@ static void run(unsigned int n)
 		dev_fd = SAFE_OPEN(dev_path, O_RDWR);
 		attach_flag = 0;
 	}
+
+	tst_res(TINFO, "Setting loopdev block size to %u", *tc->setvalue);
 	loopconfig.block_size = *(tc->setvalue);
 	verify_ioctl_loop(n);
 }
