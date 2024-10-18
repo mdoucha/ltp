@@ -80,30 +80,38 @@ static void verify_setpriority(unsigned int n)
 {
 	struct tcase *tc = &tcases[n];
 
+	tst_res(TINFO, "Start testcase %u", n);
+
 	if (tc->which == PRIO_USER && !user_added) {
 		tst_res(TCONF, "setpriority(%s(%d), %d, -20..19) skipped - Can't add user",
 			str_which(tc->which), tc->which, *tc->who);
 		return;
 	}
 
+	tst_res(TINFO, "Forking");
 	pid = SAFE_FORK();
 	if (pid == 0) {
 		if (user_added)
 			SAFE_SETUID(uid);
 		SAFE_SETPGID(0, 0);
 
+		tst_res(TINFO, "Wake parent");
 		TST_CHECKPOINT_WAKE_AND_WAIT(0);
 
 		exit(0);
 	}
 
+	tst_res(TINFO, "Wait for child");
 	TST_CHECKPOINT_WAIT(0);
 
+	tst_res(TINFO, "Change priority");
 	setpriority_test(tc);
 
+	tst_res(TINFO, "Wake child");
 	TST_CHECKPOINT_WAKE(0);
 
 	tst_reap_children();
+	tst_res(TINFO, "Finished testcase %u", n);
 }
 
 static void setup(void)
