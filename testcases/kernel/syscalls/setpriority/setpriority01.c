@@ -120,18 +120,25 @@ static void setup(void)
 	struct passwd *ltpuser;
 	int rc;
 
+	tst_res(TINFO, "Creating user %s", username);
+
 	switch ((rc = tst_cmd(cmd_useradd, NULL, NULL, TST_CMD_PASS_RETVAL))) {
 	case 0:
+		tst_res(TINFO, "User created");
 		user_added = 1;
 		ltpuser = SAFE_GETPWNAM(username);
 		uid = ltpuser->pw_uid;
+		tst_res(TINFO, "Setup finished");
 		return;
 	case 1:
 	case 255:
+		tst_res(TINFO, "User creation failed: %d", rc);
 		return;
 	default:
 		tst_brk(TBROK, "Useradd failed (%d)", rc);
 	}
+
+	tst_res(TINFO, "Setup finished");
 }
 
 static void cleanup(void)
