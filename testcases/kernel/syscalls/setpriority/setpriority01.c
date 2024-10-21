@@ -116,7 +116,8 @@ static void verify_setpriority(unsigned int n)
 
 static void setup(void)
 {
-	const char *const cmd_useradd[] = {"useradd", username, NULL};
+	const char *const cmd_useradd[] = {"strace", "-r", "useradd", username,
+		NULL};
 	struct passwd *ltpuser;
 	int rc;
 
