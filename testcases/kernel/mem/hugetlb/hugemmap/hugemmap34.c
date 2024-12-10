@@ -107,7 +107,7 @@ void setup(void)
 	SAFE_GETRLIMIT(RLIMIT_STACK, &r);
 	if (r.rlim_cur != RLIM_INFINITY)
 		tst_brk(TCONF, "Stack rlimit must be 'unlimited'");
-	fd = tst_creat_unlinked(MNTPOINT, 0);
+	fd = tst_creat_unlinked(MNTPOINT, 0, 0600);
 }
 
 void cleanup(void)
