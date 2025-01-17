@@ -53,8 +53,8 @@ static int lesser_ns_open_thread_fn(void *arg)
 static void test_lesser_ns_open(void)
 {
 	int i;
-//	static char stack[65536];
-	char *stack;
+	static char stack[65536];
+//	char *stack;
 	pid_t pid;
 	int status;
 	struct lesser_ns_open_thread_arg targ = { .fds = {0}, .loops = -1};
@@ -68,8 +68,8 @@ static void test_lesser_ns_open(void)
 		SAFE_CG_PRINT(cg_child_a, "cgroup.procs", "0");
 		SAFE_CG_FCHOWN(cg_child_a, "cgroup.procs",  nobody_uid, -1);
 		SAFE_CG_FCHOWN(cg_child_b, "cgroup.procs",  nobody_uid, -1);
-		stack = SAFE_MMAP(NULL, 65536, PROT_READ | PROT_WRITE,
-			MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+//		stack = SAFE_MMAP(NULL, 65536, PROT_READ | PROT_WRITE,
+//			MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
 		pid  = ltp_clone(CLONE_NEWCGROUP | CLONE_FILES | CLONE_VM | SIGCHLD,
 					lesser_ns_open_thread_fn, &targ, 65536, stack);
 
@@ -82,7 +82,7 @@ static void test_lesser_ns_open(void)
 
 		SAFE_WAITPID(pid, &status, 0);
 		tst_res(TINFO, "Cloned child reaped");
-		SAFE_MUNMAP(stack, 65536);
+//		SAFE_MUNMAP(stack, 65536);
 		for (i = 0; i < targ.loops; i++) {
 			if (targ.fds[i] < 1) {
 				tst_res(TFAIL, "unexpected negative fd %d", targ.fds[i]);
