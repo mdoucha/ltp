@@ -152,7 +152,7 @@ static void do_test(unsigned int n)
 	int i, ret;
 	void *ptr;
 	pid_t cpid = -1;
-	int status;
+	int status, success = 0, fail_enomem = 0, fail_other = 0;
 
 	SAFE_FILE_PRINTF("/proc/sys/vm/compact_memory", "1");
 
@@ -194,6 +194,13 @@ static void do_test(unsigned int n)
 				tst_res(TCONF,
 					"madvise() didn't support MADV_SOFT_OFFLINE");
 				return;
+			} else if (ret != EBUSY) {
+				if (!ret)
+					success++;
+				else if (ret == ENOMEM)
+					fail_enomem++;
+				else
+					fail_other++;
 			}
 		}
 
@@ -207,6 +214,8 @@ static void do_test(unsigned int n)
 	SAFE_WAITPID(cpid, &status, 0);
 	if (!WIFEXITED(status))
 		tst_res(TPASS, "Bug not reproduced");
+	tst_res(TINFO, "Soft offline: %dx pass, %dx ENOMEM, %dx other error",
+		success, fail_enomem, fail_other);
 }
 
 static void alloc_free_huge_on_node(unsigned int node, size_t size)
