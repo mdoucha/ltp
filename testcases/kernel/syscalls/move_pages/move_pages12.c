@@ -202,6 +202,9 @@ static void do_test(unsigned int n)
 				else
 					fail_other++;
 			}
+
+			if (!ret && fail_enomem)
+				tst_res(TPASS, "Soft offline passed");
 		}
 
 		SAFE_MUNMAP(addr, tcases[n].tpages * hpsz);
