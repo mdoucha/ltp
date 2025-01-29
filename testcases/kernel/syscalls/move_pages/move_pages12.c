@@ -152,7 +152,7 @@ static void do_test(unsigned int n)
 	int i, ret;
 	void *ptr;
 	pid_t cpid = -1;
-	int status, success = 0, fail_enomem = 0, fail_other = 0;
+	int status, success = 0, fail_enomem = 0, fail_other = 0, busy = 0;
 
 	SAFE_FILE_PRINTF("/proc/sys/vm/compact_memory", "1");
 
@@ -201,6 +201,8 @@ static void do_test(unsigned int n)
 					fail_enomem++;
 				else
 					fail_other++;
+			} else {
+				busy++;
 			}
 
 			if (!ret && fail_enomem)
@@ -217,8 +219,9 @@ static void do_test(unsigned int n)
 	SAFE_WAITPID(cpid, &status, 0);
 	if (!WIFEXITED(status))
 		tst_res(TPASS, "Bug not reproduced");
-	tst_res(TINFO, "Soft offline: %dx pass, %dx ENOMEM, %dx other error",
-		success, fail_enomem, fail_other);
+	tst_res(TINFO,
+		"Soft offline: %dx pass, %dx busy, %dx ENOMEM, %dx other error",
+		success, busy, fail_enomem, fail_other);
 }
 
 static void alloc_free_huge_on_node(unsigned int node, size_t size)
