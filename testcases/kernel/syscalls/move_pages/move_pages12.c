@@ -76,7 +76,7 @@
 
 #ifdef HAVE_NUMA_V2
 
-#define LOOPS	1000
+#define LOOPS	40000
 #define PATH_MEMINFO	"/proc/meminfo"
 #define PATH_NR_HUGEPAGES	"/proc/sys/vm/nr_hugepages"
 #define PATH_HUGEPAGES	"/sys/kernel/mm/hugepages/"
