@@ -12,7 +12,8 @@ TST_TIMEOUT=660
 
 nfs10_setup()
 {
-	local bsize=$(stat -f -c %s .)
+#	local bsize=$(stat -f -c %s .)
+	local bsize=1024
 
 	if [ -z "$bsize" ] || [ "$bsize" -lt 1024 ]; then
 		bsize=1024
