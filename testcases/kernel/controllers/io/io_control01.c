@@ -55,6 +55,7 @@ static void run(void)
 
 	memset(&start, 0, sizeof(struct io_stats));
 	SAFE_CG_READ(tst_cg, "io.stat", buf, BUFSIZ - 1);
+	tst_res(TINFO, "Start io.stat:\n%s", buf);
 	line = strtok_r(buf, "\n", &buf_ptr);
 	while (line) {
 		const int convs = read_io_stats(line, &start);
@@ -92,6 +93,7 @@ static void run(void)
 	tst_res(TPASS, "Did some IO in the IO controller");
 
 	SAFE_CG_READ(tst_cg, "io.stat", buf, BUFSIZ - 1);
+	tst_res(TINFO, "End io.stat:\n%s", buf);
 	line = strtok_r(buf, "\n", &buf_ptr);
 	while (line) {
 		struct io_stats end;
