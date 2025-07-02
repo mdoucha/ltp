@@ -208,10 +208,20 @@ static void run(void)
 	size_t start, length;
 	int i, f, fails = 0;
 
+	tst_res(TINFO, "Starting main loop at time %lld", (long long)time(0));
+
 	/* Test data consistency between random writes */
 	for (i = 0; !loop_arg || i < loop_count; i++) {
 		if (!tst_remaining_runtime())
 			break;
+
+		if (i && !(i % 100)) {
+			tst_res(TINFO, "Syncing file at iteration %d time %lld",
+				i, (long long)time(0));
+			SAFE_FSYNC(write_fd);
+			tst_res(TINFO, "Sync finished at time %lld",
+				(long long)time(0));
+		}
 
 		length = fill_buffer(writebuf, bufsize);
 		start = rand() % (filesize + 1 - length);
@@ -234,6 +244,8 @@ static void run(void)
 			fails++;
 		}
 	}
+
+	tst_res(TINFO, "Main loop finished at time %lld", (long long)time(0));
 
 	if (i < loop_count / 2) {
 		tst_res(TWARN, "Runtime expired, exiting early after %d loops",
