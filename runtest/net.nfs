@@ -105,6 +105,8 @@ nfs10_v40_ip6t nfs10.sh -6 -v 4 -t tcp
 nfs10_v41_ip6t nfs10.sh -6 -v 4.1 -t tcp
 nfs10_v42_ip6t nfs10.sh -6 -v 4.2 -t tcp
 
+nfs11 nfs11
+
 nfslock01_v30_ip4u nfslock01.sh -v 3 -t udp
 nfslock01_v30_ip4t nfslock01.sh -v 3 -t tcp
 nfslock01_v40_ip4t nfslock01.sh -v 4 -t tcp

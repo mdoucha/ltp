@@ -15,6 +15,7 @@
 /nfs/nfs_stress/nfs01_open_files
 /nfs/nfs_stress/nfs04_create_file
 /nfs/nfs_stress/nfs05_make_tree
+/nfs/nfs_stress/nfs11
 /nfs/nfslock01/nfs_flock
 /nfs/nfslock01/nfs_flock_dgen
 /nfsv4/acl/acl1

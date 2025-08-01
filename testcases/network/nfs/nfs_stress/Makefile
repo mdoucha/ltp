@@ -8,6 +8,8 @@ include $(top_srcdir)/include/mk/testcases.mk
 
 nfs04_create_file: CPPFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 nfs05_make_tree: LDLIBS += -lpthread
+nfs11_race: CFLAGS += -pthread
+nfs11_race: LDLIBS += -lrt
 
 INSTALL_TARGETS	:= *.sh
 
