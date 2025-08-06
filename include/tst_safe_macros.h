@@ -482,6 +482,11 @@ int safe_prctl(const char *file, const int lineno,
 #define SAFE_PRCTL(option, arg2, arg3, arg4, arg5) \
 	safe_prctl(__FILE__, __LINE__, (option), (arg2), (arg3), (arg4), (arg5))
 
+char *safe_realpath(const char *file, const int lineno, const char *path,
+	char *full_path);
+#define SAFE_REALPATH(path, full_path) \
+	safe_realpath(__FILE__, __LINE__, (path), (full_path))
+
 int safe_symlinkat(const char *file, const int lineno,
 	const char *oldpath, const int newdirfd, const char *newpath);
 

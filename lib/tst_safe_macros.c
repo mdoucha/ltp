@@ -732,6 +732,21 @@ int safe_prctl(const char *file, const int lineno,
 	return rval;
 }
 
+char *safe_realpath(const char *file, const int lineno, const char *path,
+	char *full_path)
+{
+	char *ret;
+
+	ret = realpath(path, full_path);
+
+	if (!ret) {
+		tst_brk_(file, lineno, TBROK | TERRNO, "realpath(%s) failed",
+			path);
+	}
+
+	return ret;
+}
+
 ssize_t safe_readv(const char *file, const int lineno, char len_strict,
 	int fildes, const struct iovec *iov, int iovcnt)
 {
