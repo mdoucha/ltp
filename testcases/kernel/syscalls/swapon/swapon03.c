@@ -57,7 +57,7 @@ static int setup_swap(void)
 	} else
 		waitpid(pid, &status, 0);
 
-	if (WEXITSTATUS(status))
+	if (!WIFEXITED(status) || WEXITSTATUS(status))
 		tst_brk(TFAIL, "Failed to setup swap files");
 
 	tst_res(TINFO, "Successfully created %d swap files", swapfiles);
