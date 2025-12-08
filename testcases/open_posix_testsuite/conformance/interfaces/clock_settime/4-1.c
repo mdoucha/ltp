@@ -67,6 +67,11 @@ int main(void)
 		return PTS_UNRESOLVED;
 	}
 
+	if (sigaddset(&set, SIGALRM) != 0) {
+		perror("sigaddset() was not successful\n");
+		return PTS_UNRESOLVED;
+	}
+
 	if (sigaddset(&set, SIGTOTEST) != 0) {
 		perror("sigaddset() was not successful\n");
 		return PTS_UNRESOLVED;
@@ -108,6 +113,8 @@ int main(void)
 		perror("sigwait() was not successful\n");
 		return PTS_UNRESOLVED;
 	}
+
+	printf("Received signal %d\n", sig);
 
 	if (clock_gettime(CLOCK_REALTIME, &tpT2) != 0) {
 		printf("clock_gettime() was not successful\n");
