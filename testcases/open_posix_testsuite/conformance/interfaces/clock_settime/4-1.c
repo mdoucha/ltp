@@ -36,7 +36,7 @@
 #define TIMEROFFSET 9
 #define ACCEPTABLEDELTA 1
 
-#define SIGTOTEST SIGALRM
+#define SIGTOTEST SIGUSR1
 
 int main(void)
 {
