@@ -36,7 +36,7 @@
 #define TIMEROFFSET 9
 #define ACCEPTABLEDELTA 1
 
-#define SIGTOTEST SIGUSR1
+#define SIGTOTEST SIGALRM
 
 int main(void)
 {
@@ -67,7 +67,7 @@ int main(void)
 		return PTS_UNRESOLVED;
 	}
 
-	if (sigaddset(&set, SIGALRM) != 0) {
+	if (sigaddset(&set, SIGUSR1) != 0) {
 		perror("sigaddset() was not successful\n");
 		return PTS_UNRESOLVED;
 	}
