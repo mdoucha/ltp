@@ -81,6 +81,9 @@ stop_pids_tasks_path()
 	for i in $(cat "$path/$task_list"); do
 		ROD kill -9 $i
 		wait $i
+		if [ $? -eq 127 ]; then
+			ps u --pid $i
+		fi
 	done
 }
 
