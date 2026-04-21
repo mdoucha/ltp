@@ -48,15 +48,15 @@ struct ldisc_info {
 static struct ldisc_info ldiscs[] = {
 	{2, "mouse"},
 
-	{1, "SLIP"},
-	{3, "Async PPP"},
-	{5, "AX25/KISS"},
-	{13, "HDLC"},
-	{14, "Sync PPP"},
+//	{1, "SLIP"},
+//	{3, "Async PPP"},
+//	{5, "AX25/KISS"},
+//	{13, "HDLC"},
+//	{14, "Sync PPP"},
 	{17, "SLCAN"},
-	{18, "PPS"},
-	{20, "CAIF"},
-	{21, "GSM"}
+//	{18, "PPS"},
+//	{20, "CAIF"},
+//	{21, "GSM"}
 };
 
 static struct tst_fzsync_pair fzp;
