@@ -53,8 +53,8 @@ static struct ldisc_info ldiscs[] = {
 //	{5, "AX25/KISS"},
 //	{13, "HDLC"},
 //	{14, "Sync PPP"},
-	{17, "SLCAN"},
-//	{18, "PPS"},
+//	{17, "SLCAN"},
+	{18, "PPS"},
 //	{20, "CAIF"},
 //	{21, "GSM"}
 };
