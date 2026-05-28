@@ -31,6 +31,7 @@ static void test_signal(int signum)
 		exit(0);
 	}
 
+	tst_res(TINFO, "Testing signal %s", tst_strsig(signum));
 	SAFE_WAITPID(child, &status, 0);
 
 	switch (signum) {
