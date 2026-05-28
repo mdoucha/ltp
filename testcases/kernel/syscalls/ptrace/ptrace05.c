@@ -28,6 +28,7 @@ static void test_signal(int signum)
 		TST_EXP_PASS_SILENT(ptrace(PTRACE_TRACEME, 0, NULL, NULL));
 		tst_res(TDEBUG, "[child] Sending kill(.., %s)", tst_strsig(signum));
 		SAFE_KILL(getpid(), signum);
+		tst_res(TDEBUG, "[child] Exiting");
 		exit(0);
 	}
 
@@ -75,6 +76,8 @@ static void run(void)
 			continue;
 		test_signal(signum);
 	}
+
+	tst_res(TINFO, "Test finished");
 }
 
 static struct tst_test test = {
