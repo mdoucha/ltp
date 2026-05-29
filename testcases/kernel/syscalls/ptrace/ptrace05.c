@@ -65,6 +65,8 @@ static void test_signal(int signum)
 
 	if (signum != 0 && signum != SIGKILL)
 		SAFE_PTRACE(PTRACE_CONT, child, NULL, NULL);
+
+	tst_reap_children();
 }
 
 static void run(void)
