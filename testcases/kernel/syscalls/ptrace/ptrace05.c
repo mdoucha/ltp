@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <sys/ptrace.h>
+#include <sys/wait.h>
 #include "lapi/signal.h"
 #include "tst_test.h"
 
@@ -25,10 +26,11 @@ static void test_signal(int signum)
 	child = SAFE_FORK();
 
 	if (!child) {
+		child = getpid();
 		TST_EXP_PASS_SILENT(ptrace(PTRACE_TRACEME, 0, NULL, NULL));
-		tst_res(TDEBUG, "[child] Sending kill(.., %s)", tst_strsig(signum));
+		tst_res(TDEBUG, "[child %d] Sending kill(.., %s)", child, tst_strsig(signum));
 		SAFE_KILL(getpid(), signum);
-		tst_res(TDEBUG, "[child] Exiting");
+		tst_res(TDEBUG, "[child %d] Exiting", child);
 		exit(0);
 	}
 
@@ -65,13 +67,12 @@ static void test_signal(int signum)
 
 	if (signum != 0 && signum != SIGKILL)
 		SAFE_PTRACE(PTRACE_CONT, child, NULL, NULL);
-
-	tst_reap_children();
 }
 
 static void run(void)
 {
-	int signum = 0;
+	int signum = 0, wstatus;
+	pid_t pid;
 
 	for (signum = 0; signum <= SIGRTMAX; signum++) {
 		if (signum >= __SIGRTMIN && signum < SIGRTMIN)
@@ -80,6 +81,28 @@ static void run(void)
 	}
 
 	tst_res(TINFO, "Test finished");
+
+	for (pid = wait(&wstatus); pid > 0; pid = wait(&wstatus)) {
+		if (WIFCONTINUED(wstatus)) {
+			tst_res(TINFO, "Child %d resumed execution\n", pid);
+			continue;
+		}
+
+		if (WIFSTOPPED(wstatus)) {
+			tst_res(TFAIL, "Child %d was stopped by signal %s",
+				pid, tst_strsig(WSTOPSIG(wstatus)));
+			SAFE_PTRACE(PTRACE_CONT, pid, NULL, NULL);
+		} else if (WIFEXITED(wstatus)) {
+			tst_res(TINFO, "Child %d exited normally", pid);
+		} else {
+			tst_res(TFAIL, "Child %d changed status: 0x%x",
+				pid, (unsigned int)wstatus);
+			kill(pid, SIGKILL);
+		}
+	}
+
+	if (errno != ECHILD)
+		tst_res(TFAIL | TERRNO, "Final wait() failed");
 }
 
 static struct tst_test test = {
