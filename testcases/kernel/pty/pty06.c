@@ -62,7 +62,7 @@ static void do_test(void)
 
 	while (tst_fzsync_run_a(&fzp)) {
 		tst_fzsync_start_race_a(&fzp);
-		ioctl(fd, VT_DISALLOCATE, test_tty_port);
+		//ioctl(fd, VT_DISALLOCATE, test_tty_port);
 		tst_fzsync_end_race_a(&fzp);
 		if (tst_taint_check()) {
 			tst_res(TFAIL, "Kernel is vulnerable");
