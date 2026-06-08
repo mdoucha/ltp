@@ -71,7 +71,8 @@ static void test_signal(int signum)
 
 static void run(void)
 {
-	int signum = 0, wstatus;
+	int signum = 0, retries = 0, wstatus;
+	int wflags = WNOHANG | WUNTRACED | WCONTINUED;
 	pid_t pid;
 
 	for (signum = 0; signum <= SIGRTMAX; signum++) {
@@ -81,8 +82,22 @@ static void run(void)
 	}
 
 	tst_res(TINFO, "Test finished");
+	usleep(100000);
 
-	for (pid = wait(&wstatus); pid > 0; pid = wait(&wstatus)) {
+	for (pid = waitpid(-1, &wstatus, wflags); pid >= 0;
+		pid = waitpid(-1, &wstatus, wflags)) {
+		if (!pid) {
+			if (retries++ <= SIGRTMAX) {
+				tst_res(TFAIL, "A child is stuck");
+				kill(0, SIGCONT);
+				usleep(10000);
+				continue;
+			}
+
+			kill(-getpid(), SIGKILL);
+			tst_brk(TBROK, "Stuck children did not wake up");
+		}
+
 		if (WIFCONTINUED(wstatus)) {
 			tst_res(TINFO, "Child %d resumed execution\n", pid);
 			continue;
@@ -92,6 +107,7 @@ static void run(void)
 			tst_res(TFAIL, "Child %d was stopped by signal %s",
 				pid, tst_strsig(WSTOPSIG(wstatus)));
 			SAFE_PTRACE(PTRACE_CONT, pid, NULL, NULL);
+			usleep(10000);
 		} else if (WIFEXITED(wstatus)) {
 			tst_res(TINFO, "Child %d exited normally", pid);
 		} else {
