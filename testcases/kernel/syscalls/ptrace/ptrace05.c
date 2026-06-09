@@ -69,6 +69,17 @@ static void test_signal(int signum)
 		SAFE_PTRACE(PTRACE_CONT, child, NULL, NULL);
 }
 
+static pid_t get_child(void)
+{
+	char buf[PATH_MAX];
+	pid_t self = getpid();
+	int ret = 0;
+
+	snprintf(buf, PATH_MAX, "/proc/%d/task/%d/children", self, self);
+	SAFE_FILE_SCANF(buf, "%d", &ret);
+	return (pid_t)ret;
+}
+
 static void run(void)
 {
 	int signum = 0, retries = 0, wstatus;
@@ -89,7 +100,12 @@ static void run(void)
 		if (!pid) {
 			if (retries++ <= SIGRTMAX) {
 				tst_res(TFAIL, "A child is stuck");
-				kill(0, SIGCONT);
+				pid = get_child();
+
+				if (!pid)
+					tst_brk(TBROK, "No children left?!");
+
+				SAFE_PTRACE(PTRACE_CONT, pid, NULL, NULL);
 				usleep(10000);
 				continue;
 			}
