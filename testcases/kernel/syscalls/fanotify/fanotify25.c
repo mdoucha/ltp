@@ -95,8 +95,13 @@ static void run(void)
 	if (!SAFE_FORK()) {
 		do_child();
 		SAFE_CLOSE(fan_fd);
+		tst_res(TINFO, "Child exiting");
 		exit(0);
 	}
+
+	tst_res(TINFO, "Child forked");
+	tst_reap_children();
+	tst_res(TINFO, "Child reaped");
 }
 
 static void cleanup(void)
@@ -104,8 +109,12 @@ static void cleanup(void)
 	if (fan_fd >= 0)
 		SAFE_CLOSE(fan_fd);
 
+	tst_res(TINFO, "Fanotify descriptor closed");
+
 	if (unmount_needed)
 		SAFE_UMOUNT(MNTPOINT);
+
+	tst_res(TINFO, "Mountpoint restored to original state");
 }
 
 static struct tst_test test = {
