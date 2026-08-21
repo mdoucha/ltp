@@ -616,6 +616,7 @@ static inline int tst_fzsync_run_a(struct tst_fzsync_pair *pair)
 	tst_fzsync_wait_a(pair);
 
 	if (pair->exit) {
+		tst_res(TINFO, "Exiting after %d loops", pair->exec_loop);
 		tst_fzsync_pair_cleanup(pair);
 		return 0;
 	}
